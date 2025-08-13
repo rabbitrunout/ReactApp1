@@ -6,7 +6,9 @@ function BookingBanner({ userName, bookings }) {
 
   return (
     <div className="alert alert-info text-center">
-      <h5>Hello, {userName}!</h5>
+      <h5 className="hello-text">
+        Hello, <span className="name">{userName}</span>!
+      </h5>
       <p>Total reservations: {total} | Completed: {completed}</p>
     </div>
   );

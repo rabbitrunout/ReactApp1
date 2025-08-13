@@ -4,11 +4,20 @@ import BookingBanner from "./BookingBanner";
 import BookingCreator from "./BookingCreator";
 import BookingRow from "./BookingRow";
 import VisibilityControl from "./VisibilityControl";
+import UserNameInput from "./UserNameInput";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  const [userName, setUserName] = useState("Visitor");
+  const [userName, setUserName] = useState(() => {
+    return localStorage.getItem("userName") || "Visitor";
+  });
+
+  const saveUserName = (newName) => {
+    setUserName(newName);
+    localStorage.setItem("userName", newName);
+  };
+
   const [bookings, setBookings] = useState([]);
   const [showCompleted, setShowCompleted] = useState(true);
 
@@ -79,8 +88,6 @@ function App() {
           setBookings(parsed);
         }
       } else {
-        // дефолтные данные
-        setUserName("Visitor");
         setBookings([
           { zone: "Zone A", slot: "10:00", confirmed: false },
           { zone: "Zone B", slot: "12:00", confirmed: true },
@@ -100,17 +107,10 @@ function App() {
     <div className="container mt-3">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <div className="my-3">
-        <label>Your name:</label>
-        <input
-          type="text"
-          value={userName}
-          onChange={e => setUserName(e.target.value)}
-          className="form-control"
-          placeholder="Please enter your name"
-        />
-      </div>
+      {/* Ввод имени */}
+      <UserNameInput userName={userName} saveUserName={saveUserName} />
 
+      {/* Баннер с приветствием */}
       <BookingBanner userName={userName} bookings={bookings} />
 
       <BookingCreator bookings={bookings} callback={createNewBooking} />
