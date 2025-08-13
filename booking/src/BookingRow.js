@@ -5,7 +5,7 @@ function BookingRow({ booking, toggleConfirm, editBooking, deleteBooking }) {
   const [editZone, setEditZone] = useState(booking.zone);
   const [editSlot, setEditSlot] = useState(booking.slot);
 
-  const zones = ["Zone A", "Zone B", "Zone C", "Zone D"];
+  const zones = ["Aurora Room", "Sunset Deck", "Luna Lounge", "Starlight Terrace"];
   const slots = ["09:00-12:00", "12:00-15:00", "15:00-18:00"];
 
   const handleSave = () => {

@@ -21,7 +21,7 @@ function App() {
   const [bookings, setBookings] = useState([]);
   const [showCompleted, setShowCompleted] = useState(true);
 
-  // Создание новой брони
+  // Creating a new reservation
   const createNewBooking = (zone, slot) => {
     if (!bookings.find(b => b.zone === zone && b.slot === slot)) {
       const updated = [...bookings, { zone, slot, confirmed: false }];
@@ -33,7 +33,7 @@ function App() {
     }
   };
 
-  // Подтверждение / отмена подтверждения
+  // Confirmation / cancellation of confirmation
   const toggleConfirm = booking => {
     const updated = bookings.map(b =>
       b.zone === booking.zone && b.slot === booking.slot
@@ -44,7 +44,7 @@ function App() {
     localStorage.setItem("bookings", JSON.stringify(updated));
   };
 
-  // Удаление брони
+  // Delete reservation
   const deleteBooking = booking => {
     const updated = bookings.filter(
       b => !(b.zone === booking.zone && b.slot === booking.slot)
@@ -54,7 +54,7 @@ function App() {
     toast.info("Reservation deleted!");
   };
 
-  // Редактирование брони
+  // edit reservation
   const editBooking = (oldBooking, newZone, newSlot) => {
     if (!bookings.find(b => b.zone === newZone && b.slot === newSlot)) {
       const updated = bookings.map(b =>
@@ -70,7 +70,7 @@ function App() {
     }
   };
 
-  // Очистка всех завершённых
+  // Clearing all completed ones
   const clearCompleted = () => {
     const updated = bookings.filter(b => !b.confirmed);
     setBookings(updated);
@@ -78,7 +78,7 @@ function App() {
     toast.info("All completed reservations cleared!");
   };
 
-  // Загрузка из localStorage с дефолтами
+  // Downloading from localStorage with defaults
   useEffect(() => {
     try {
       const data = localStorage.getItem("bookings");
@@ -89,9 +89,9 @@ function App() {
         }
       } else {
         setBookings([
-          { zone: "Zone A", slot: "10:00", confirmed: false },
-          { zone: "Zone B", slot: "12:00", confirmed: true },
-          { zone: "Zone C", slot: "14:00", confirmed: false }
+          { zone: "Aurora Room - is for sophisticated meeting.", slot: "10:00", confirmed: false },
+          { zone: "Sunset Deck – with sunset view.", slot: "12:00", confirmed: true },
+          { zone: "Luna Lounge - is a cozy evening area.", slot: "14:00", confirmed: false }
         ]);
         setShowCompleted(true);
       }
@@ -107,10 +107,8 @@ function App() {
     <div className="container mt-3">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* Ввод имени */}
       <UserNameInput userName={userName} saveUserName={saveUserName} />
 
-      {/* Баннер с приветствием */}
       <BookingBanner userName={userName} bookings={bookings} />
 
       <BookingCreator bookings={bookings} callback={createNewBooking} />

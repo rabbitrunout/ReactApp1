@@ -4,16 +4,20 @@ function BookingCreator({ bookings, callback }) {
   const [zone, setZone] = useState("Zone A");
   const [slot, setSlot] = useState("09:00-12:00");
 
-  const zones = ["Zone A", "Zone B", "Zone C", "Zone D"];
+  const zones = [
+    "Aurora Room", 
+    "Sunset Deck ", 
+    "Luna Lounge", 
+    "Starlight Terrace"];
   const slots = ["09:00-12:00", "12:00-15:00", "15:00-18:00"];
 
-  // Для визуальной пометки
+  // For visual marking
   const occupiedSlots = bookings
     .filter(b => b.zone === zone)
     .map(b => b.slot);
 
   const handleAdd = () => {
-    callback(zone, slot); // Проверка дубликата — в App.js
+    callback(zone, slot); // Duplicate verification — в App.js
   };
 
   return (
