@@ -12,57 +12,86 @@ function App() {
   const [bookings, setBookings] = useState([]);
   const [showCompleted, setShowCompleted] = useState(true);
 
-  // Загрузка бронирований
-  useEffect(() => {
-    const data = localStorage.getItem("bookings");
-    setBookings(data ? JSON.parse(data) : []);
-  }, []);
-
-  // Автосохранение
-  useEffect(() => {
-    localStorage.setItem("bookings", JSON.stringify(bookings));
-  }, [bookings]);
-
-  // Добавление новой брони
+  // Создание новой брони
   const createNewBooking = (zone, slot) => {
     if (!bookings.find(b => b.zone === zone && b.slot === slot)) {
-      setBookings([...bookings, { zone, slot, confirmed: false }]);
+      const updated = [...bookings, { zone, slot, confirmed: false }];
+      setBookings(updated);
+      localStorage.setItem("bookings", JSON.stringify(updated));
       toast.success("Reservation added!");
     } else {
       toast.error("That slot is already taken!");
     }
   };
 
-  // Подтверждение брони (перенос в завершённые)
+  // Подтверждение / отмена подтверждения
   const toggleConfirm = booking => {
-    setBookings(bookings.map(b =>
+    const updated = bookings.map(b =>
       b.zone === booking.zone && b.slot === booking.slot
         ? { ...b, confirmed: !b.confirmed }
         : b
-    ));
+    );
+    setBookings(updated);
+    localStorage.setItem("bookings", JSON.stringify(updated));
   };
 
   // Удаление брони
   const deleteBooking = booking => {
-    setBookings(bookings.filter(b =>
-      !(b.zone === booking.zone && b.slot === booking.slot)
-    ));
+    const updated = bookings.filter(
+      b => !(b.zone === booking.zone && b.slot === booking.slot)
+    );
+    setBookings(updated);
+    localStorage.setItem("bookings", JSON.stringify(updated));
     toast.info("Reservation deleted!");
   };
 
   // Редактирование брони
   const editBooking = (oldBooking, newZone, newSlot) => {
     if (!bookings.find(b => b.zone === newZone && b.slot === newSlot)) {
-      setBookings(bookings.map(b =>
+      const updated = bookings.map(b =>
         b.zone === oldBooking.zone && b.slot === oldBooking.slot
           ? { ...b, zone: newZone, slot: newSlot }
           : b
-      ));
+      );
+      setBookings(updated);
+      localStorage.setItem("bookings", JSON.stringify(updated));
       toast.success("Reservation changed!");
     } else {
       toast.error("That slot is already taken!");
     }
   };
+
+  // Очистка всех завершённых
+  const clearCompleted = () => {
+    const updated = bookings.filter(b => !b.confirmed);
+    setBookings(updated);
+    localStorage.setItem("bookings", JSON.stringify(updated));
+    toast.info("All completed reservations cleared!");
+  };
+
+  // Загрузка из localStorage с дефолтами
+  useEffect(() => {
+    try {
+      const data = localStorage.getItem("bookings");
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          setBookings(parsed);
+        }
+      } else {
+        // дефолтные данные
+        setUserName("Visitor");
+        setBookings([
+          { zone: "Zone A", slot: "10:00", confirmed: false },
+          { zone: "Zone B", slot: "12:00", confirmed: true },
+          { zone: "Zone C", slot: "14:00", confirmed: false }
+        ]);
+        setShowCompleted(true);
+      }
+    } catch (err) {
+      console.error("Failed to load bookings:", err);
+    }
+  }, []);
 
   const activeBookings = bookings.filter(b => !b.confirmed);
   const completedBookings = bookings.filter(b => b.confirmed);
@@ -101,7 +130,6 @@ function App() {
                 <BookingRow
                   key={`${b.zone}-${b.slot}`}
                   booking={b}
-                  bookings={bookings}
                   toggleConfirm={toggleConfirm}
                   editBooking={editBooking}
                   deleteBooking={deleteBooking}
@@ -114,11 +142,13 @@ function App() {
         )}
       </div>
 
-      <VisibilityControl
-        description="Show completed reservations"
-        isChecked={showCompleted}
-        callback={setShowCompleted}
-      />
+      <div className="bg-secondary text-white text-center p-2">
+        <VisibilityControl
+          description="Show completed reservations"
+          isChecked={showCompleted}
+          callback={setShowCompleted}
+        />
+      </div>
 
       {showCompleted && completedBookings.length > 0 && (
         <div className="table-responsive mt-3">
@@ -135,14 +165,18 @@ function App() {
                 <BookingRow
                   key={`${b.zone}-${b.slot}`}
                   booking={b}
-                  bookings={bookings}
                   toggleConfirm={toggleConfirm}
-                  editBooking={editBooking}
                   deleteBooking={deleteBooking}
                 />
               ))}
             </tbody>
           </table>
+
+          <div className="text-center mt-3">
+            <button className="btn btn-danger" onClick={clearCompleted}>
+              Clear All Completed
+            </button>
+          </div>
         </div>
       )}
 
